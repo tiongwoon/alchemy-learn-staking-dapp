@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, List } from "antd";
+import { Alert, Button, Col, Menu, Row, InputNumber, Form } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
@@ -56,6 +56,8 @@ const targetNetwork = NETWORKS.localhost; // <------- select your target fronten
 const DEBUG = true;
 const NETWORKCHECK = true;
 
+
+
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
@@ -68,8 +70,8 @@ const scaffoldEthProvider = navigator.onLine
   : null;
 const poktMainnetProvider = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider(
-      "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-    )
+    "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  )
   : null;
 const mainnetInfura = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
@@ -168,11 +170,13 @@ function App(props) {
     poktMainnetProvider && poktMainnetProvider._isProvider
       ? poktMainnetProvider
       : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+        ? scaffoldEthProvider
+        : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
+
+
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -268,6 +272,15 @@ function App(props) {
   const timeLeft = useContractReader(readContracts, "Staker", "timeLeft");
   console.log("⏳ timeLeft:", timeLeft);
 
+    // ** keep track of a variable from the contract in the local React state:
+    const claimPeriodLeft = useContractReader(readContracts, "Staker", "claimPeriodLeft");
+    console.log("⏳ Claim Period Left:", claimPeriodLeft);
+  
+    const withdrawalTimeLeft = useContractReader(readContracts, "Staker", "withdrawalTimeLeft");
+    console.log("⏳ Withdrawal Time Left:", withdrawalTimeLeft);
+  
+    const rewardRatePerSecond = useContractReader(readContracts, "Staker", "rewardRatePerSecond");
+
   // ** Listen for when the contract has been 'completed'
   const complete = useContractReader(readContracts, "ExampleExternalContract", "completed");
   console.log("✅ complete:", complete);
@@ -287,6 +300,8 @@ function App(props) {
       </div>
     );
   }
+
+
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -516,20 +531,37 @@ function App(props) {
               <Address value={readContracts && readContracts.Staker && readContracts.Staker.address} />
             </div>
 
-            <div style={{ padding: 8, marginTop: 32 }}>
-              <div>Timeleft:</div>
-              {timeLeft && humanizeDuration(timeLeft.toNumber() * 1000)}
+            <div style={{ padding: 8, marginTop: 16 }}>
+              <div>Reward Rate per Second</div>
+              <Balance balance={rewardRatePerSecond} fontSize={64} /> ETH
+            </div>
+
+            <div style={{ padding: 8, marginTop: 16, fontWeight: "bold" }}>
+              <div>Claim Period Left:</div>
+              {claimPeriodLeft && humanizeDuration(claimPeriodLeft.toNumber() * 1000)}
+            </div>
+
+            <div style={{ padding: 8, marginTop: 16, fontWeight: "bold" }}>
+              <div>Withdrawal Period Left:</div>
+              {withdrawalTimeLeft && humanizeDuration(withdrawalTimeLeft.toNumber() * 1000)}
+            </div>
+
+
+            <div style={{ padding: 8 }}>
+              <div>Total available ETH in contract:</div>
+              <Balance balance={stakerContractBalance} fontSize={64} />
             </div>
 
             <div style={{ padding: 8 }}>
-              <div>Total staked:</div>
-              <Balance balance={stakerContractBalance} fontSize={64} />/<Balance balance={threshold} fontSize={64} />
+              <div>ETH Locked in Staker Contract:</div>
+              <Balance balance={balanceStaked} fontSize={64} />
             </div>
-
+{/*
             <div style={{ padding: 8 }}>
               <div>You staked:</div>
               <Balance balance={balanceStaked} fontSize={64} />
             </div>
+            */}
 
             <div style={{ padding: 8 }}>
               <Button
@@ -568,7 +600,7 @@ function App(props) {
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
-            */}
+           
 
             <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
               <div>Stake Events:</div>
@@ -584,6 +616,7 @@ function App(props) {
                 }}
               />
             </div>
+             */}
 
             {/* uncomment for a second contract:
             <Contract
@@ -637,7 +670,7 @@ function App(props) {
 
       <div style={{ marginTop: 32, opacity: 0.5 }}>
         {/* Add your address here */}
-        Created by <Address value={"Your...address"} ensProvider={mainnetProvider} fontSize={16} />
+        Created by <Address value={"tiongwoon.eth"} ensProvider={mainnetProvider} fontSize={16} />
       </div>
 
       <div style={{ marginTop: 32, opacity: 0.5 }}>
@@ -690,3 +723,6 @@ function App(props) {
 }
 
 export default App;
+
+
+
