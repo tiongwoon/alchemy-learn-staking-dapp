@@ -1,4 +1,25 @@
-# 🏗 scaffold-eth | 🏰 BuidlGuidl
+# Alchemy Learn Lesson 6 - Building a staking dApp
+You can find the full description of the lesson with detailed step-by-step guide via: https://docs.alchemy.com/docs/how-to-build-a-staking-dapp#challenge-time 
+
+But here I will walk through my solution for 2 challenges in the article. 
+
+## 🚩 Challenge 1
+### Update the interest mechanism in the Staker.sol contract so that you receive a "non-linear" amount of ETH based on the blocks between deposit and withdrawal. 
+
+The equation I am using for the interest is y = 1.025^x, which in our x range of interest is approximately similar, albeit with a tinge of exponentiality. 
+
+> Why 1.025? I personally did not want the interest multiplier to vary too much as we might not have enough ETH in the contract to pay out. Since x range is rather small, I iterated through a few constant values and finally landed on 1.025. If you plot the graph you will observe that it starts getting 'exponential' after around x=140 hence the curve before that is suitable for this case.  
+___
+
+
+## 🚩🚩 Challenge 3
+###  Instead of using the vanilla ExampleExternalContract contract, implement a function in Staker.sol that allows you to retrieve the ETH locked up in ExampleExternalContract and re-deposit it back into the Staker contract.
+
+* Make sure to only "white-list" a single address to call this new function to gate its usage!
+* Make sure that you create logic/remove existing code to ensure that users are able to interact with the Staker contract over and over again! We want to be able to ping-pong from Staker -> ExampleExternalContract repeatedly!
+
+In order to solve this, 
+* We need to refactor such that the timer can restart 
 
 ## 🚩 Challenge 1: 🥩 Decentralized Staking App
 
